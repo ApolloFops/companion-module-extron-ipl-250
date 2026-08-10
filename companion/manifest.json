@@ -1,18 +1,18 @@
 {
 	"$schema": "../node_modules/@companion-module/base/assets/manifest.schema.json",
 	"type": "connection",
-	"id": "your-module-name",
-	"name": "your-module-name",
-	"shortname": "module-shortname",
-	"description": "A short one line description of your module",
+	"id": "extron-ipl-250",
+	"name": "extron-ipl-250",
+	"shortname": "IPL 250",
+	"description": "Extron IPL 250 control processor module for Companion.",
 	"version": "0.0.0",
 	"license": "MIT",
-	"repository": "git+https://github.com/bitfocus/companion-module-your-module-name.git",
-	"bugs": "https://github.com/bitfocus/companion-module-your-module-name/issues",
+	"repository": "git+https://github.com/ApolloFops/companion-module-extron-ipl-250.git",
+	"bugs": "https://github.com/ApolloFops/companion-module-extron-ipl-250/issues",
 	"maintainers": [
 		{
-			"name": "Your name",
-			"email": "Your email"
+			"name": "Apollo Nargang",
+			"email": "apollo@apollofops.net"
 		}
 	],
 	"runtime": {
@@ -22,7 +22,7 @@
 		"entrypoint": "../dist/main.js"
 	},
 	"legacyIds": [],
-	"manufacturer": "Your company",
-	"products": ["Your product"],
+	"manufacturer": "Extron",
+	"products": ["IPL 250"],
 	"keywords": []
 }
