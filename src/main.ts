@@ -1,4 +1,4 @@
-import { InstanceBase, InstanceStatus, type SomeCompanionConfigField } from '@companion-module/base'
+import { InstanceBase, InstanceStatus, TelnetHelper, type SomeCompanionConfigField } from '@companion-module/base'
 import { GetConfigFields, type ModuleConfig } from './config.js'
 import { UpdateVariableDefinitions, type VariablesSchema } from './variables.js'
 import { UpgradeScripts } from './upgrades.js'
@@ -18,6 +18,7 @@ export { UpgradeScripts }
 
 export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	config!: ModuleConfig // Setup in init()
+	telnet: TelnetHelper | null = null
 
 	constructor(internal: unknown) {
 		super(internal)
@@ -32,6 +33,8 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		this.updateFeedbacks() // export feedbacks
 		this.updatePresets() // export Presets
 		this.updateVariableDefinitions() // export variable definitions
+
+		this.initConnection()
 	}
 	// When module gets deleted
 	async destroy(): Promise<void> {
@@ -61,5 +64,15 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 
 	updateVariableDefinitions(): void {
 		UpdateVariableDefinitions(this)
+	}
+
+	private initConnection(): void {
+		this.telnet = new TelnetHelper('192.168.1.225', 23)
+
+		this.telnet.on('error', (err) => console.error('Telnet Error:', err))
+		this.telnet.on('connect', () => console.log('Connected!'))
+		this.telnet.on('data', (data) => console.log('Received:', data.toString()))
+		this.telnet.on('iac', (command, option) => console.log('IAC:', command, option))
+		this.telnet.on('sb', (buffer) => console.log('Subnegotiation:', buffer))
 	}
 }

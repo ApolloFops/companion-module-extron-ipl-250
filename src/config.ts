@@ -10,18 +10,18 @@ export function GetConfigFields(): SomeCompanionConfigField[] {
 		{
 			type: 'textinput',
 			id: 'host',
-			label: 'Target IP',
+			label: 'IPL IP',
 			width: 8,
 			regex: Regex.IP,
 		},
 		{
 			type: 'number',
 			id: 'port',
-			label: 'Target Port',
+			label: 'IPL Telnet Port',
 			width: 4,
 			min: 1,
 			max: 65535,
-			default: 8000,
+			default: 23,
 		},
 	]
 }
