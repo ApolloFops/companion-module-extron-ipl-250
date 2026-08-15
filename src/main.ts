@@ -73,9 +73,17 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	private initConnection(): void {
 		this.telnet = new TelnetHelper(this.config.host, this.config.port)
 
-		this.telnet.on('error', (err) => console.error('Telnet Error:', err))
+		this.updateStatus(InstanceStatus.Connecting)
+
+		this.telnet.on('error', (err) => {
+			console.error('Telnet Error:', err)
+
+			this.updateStatus(InstanceStatus.ConnectionFailure, err.message)
+		})
 		this.telnet.on('connect', () => {
 			console.log('Connected!')
+
+			this.updateStatus(InstanceStatus.Ok)
 
 			if (this.telnet) {
 				this.telnet.send('\x1B3CV\r')
@@ -96,6 +104,8 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 			this.telnet.destroy()
 			this.telnet = null
 		}
+
+		this.updateStatus(InstanceStatus.Disconnected)
 	}
 
 	private parseResponse(response: string): void {
