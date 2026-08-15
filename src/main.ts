@@ -39,10 +39,14 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	// When module gets deleted
 	async destroy(): Promise<void> {
 		this.log('debug', 'destroy')
+		this.disconnect()
 	}
 
 	async configUpdated(config: ModuleConfig): Promise<void> {
 		this.config = config
+
+		this.disconnect()
+		this.initConnection()
 	}
 
 	// Return config fields for web config
@@ -67,7 +71,7 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	}
 
 	private initConnection(): void {
-		this.telnet = new TelnetHelper('192.168.1.225', 23)
+		this.telnet = new TelnetHelper(this.config.host, this.config.port)
 
 		this.telnet.on('error', (err) => console.error('Telnet Error:', err))
 		this.telnet.on('connect', () => {
@@ -84,6 +88,14 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		})
 		this.telnet.on('iac', (command, option) => console.log('IAC:', command, option))
 		this.telnet.on('sb', (buffer) => console.log('Subnegotiation:', buffer))
+	}
+
+	private disconnect(): void {
+		if (this.telnet) {
+			this.telnet.removeAllListeners()
+			this.telnet.destroy()
+			this.telnet = null
+		}
 	}
 
 	private parseResponse(response: string): void {
