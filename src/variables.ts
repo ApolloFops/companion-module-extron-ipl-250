@@ -1,15 +1,17 @@
 import type ModuleInstance from './main.js'
 
 export type VariablesSchema = {
-	variable1: string
-	variable2: string
-	variable3: string
+	input1: boolean
+	input2: boolean
+	input3: boolean
+	input4: boolean
 }
 
 export function UpdateVariableDefinitions(self: ModuleInstance): void {
 	self.setVariableDefinitions({
-		variable1: { name: 'My first variable' },
-		variable2: { name: 'My second variable' },
-		variable3: { name: 'Another variable' },
+		input1: { name: 'Contact Input 1' },
+		input2: { name: 'Contact Input 2' },
+		input3: { name: 'Contact Input 3' },
+		input4: { name: 'Contact Input 4' },
 	})
 }

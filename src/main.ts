@@ -70,9 +70,28 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		this.telnet = new TelnetHelper('192.168.1.225', 23)
 
 		this.telnet.on('error', (err) => console.error('Telnet Error:', err))
-		this.telnet.on('connect', () => console.log('Connected!'))
-		this.telnet.on('data', (data) => console.log('Received:', data.toString()))
+		this.telnet.on('connect', () => {
+			console.log('Connected!')
+
+			if (this.telnet) {
+				this.telnet.send('\x1B3CV\r')
+			}
+		})
+		this.telnet.on('data', (data) => {
+			console.log('Received:', data.toString())
+
+			this.parseResponse(data.toString())
+		})
 		this.telnet.on('iac', (command, option) => console.log('IAC:', command, option))
 		this.telnet.on('sb', (buffer) => console.log('Subnegotiation:', buffer))
+	}
+
+	private parseResponse(response: string): void {
+		// Input values
+		const contactInputRegex: RegExp = /Cpn(\d) Sio(\d)\r\n/g
+		const contactInputMatches = [...response.matchAll(contactInputRegex)]
+
+		const contactInputValues = contactInputMatches.map((match) => [`input${parseInt(match[1])}`, match[2] === '1'])
+		this.setVariableValues(Object.fromEntries(contactInputValues))
 	}
 }
