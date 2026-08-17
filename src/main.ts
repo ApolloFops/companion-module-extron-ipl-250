@@ -20,6 +20,7 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	config!: ModuleConfig // Setup in init()
 	telnet: TelnetHelper | null = null
 	heartbeat: ReturnType<typeof setTimeout> | undefined = undefined
+	reconnectTimeout: ReturnType<typeof setTimeout> | undefined = undefined
 
 	constructor(internal: unknown) {
 		super(internal)
@@ -35,6 +36,7 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		this.updatePresets() // export Presets
 		this.updateVariableDefinitions() // export variable definitions
 
+		this.updateStatus(InstanceStatus.Connecting)
 		this.initConnection()
 	}
 	// When module gets deleted
@@ -47,6 +49,7 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		this.config = config
 
 		this.disconnect()
+		this.updateStatus(InstanceStatus.Connecting)
 		this.initConnection()
 	}
 
@@ -74,8 +77,6 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	private initConnection(): void {
 		this.telnet = new TelnetHelper(this.config.host, this.config.port)
 
-		this.updateStatus(InstanceStatus.Connecting)
-
 		this.telnet.on('connect', () => {
 			this.log('info', 'Connected!')
 
@@ -100,6 +101,7 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 			this.updateStatus(InstanceStatus.ConnectionFailure, err.message)
 
 			this.disconnect()
+			this.scheduleReconnect()
 		})
 
 		this.telnet.on('end', () => {
@@ -108,6 +110,7 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 			this.updateStatus(InstanceStatus.Disconnected)
 
 			this.disconnect()
+			this.scheduleReconnect()
 		})
 	}
 
@@ -128,6 +131,15 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		this.heartbeat = setInterval(() => {
 			this.telnet?.send('N\n') // Should respond with model number
 		}, 10000)
+	}
+
+	private scheduleReconnect(): void {
+		clearTimeout(this.reconnectTimeout)
+
+		this.reconnectTimeout = setTimeout(() => {
+			this.log('info', 'Attempting to reconnect...')
+			this.initConnection()
+		}, 5000)
 	}
 
 	private parseResponse(response: string): void {
