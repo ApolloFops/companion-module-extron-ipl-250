@@ -77,7 +77,7 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		this.updateStatus(InstanceStatus.Connecting)
 
 		this.telnet.on('connect', () => {
-			console.log('Connected!')
+			this.log('info', 'Connected!')
 
 			this.updateStatus(InstanceStatus.Ok)
 
@@ -89,13 +89,13 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		})
 
 		this.telnet.on('data', (data) => {
-			console.log('Received:', data.toString())
+			this.log('debug', `Received: ${data.toString()}`)
 
 			this.parseResponse(data.toString())
 		})
 
 		this.telnet.on('error', (err) => {
-			console.error('Telnet Error:', err)
+			this.log('error', `Telnet Error: ${err}`)
 
 			this.updateStatus(InstanceStatus.ConnectionFailure, err.message)
 
@@ -103,7 +103,7 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		})
 
 		this.telnet.on('end', () => {
-			console.error('Connection closed')
+			this.log('warn', 'Connection closed')
 
 			this.updateStatus(InstanceStatus.Disconnected)
 
