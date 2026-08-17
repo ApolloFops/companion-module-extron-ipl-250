@@ -19,6 +19,7 @@ export { UpgradeScripts }
 export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	config!: ModuleConfig // Setup in init()
 	telnet: TelnetHelper | null = null
+	heartbeat: ReturnType<typeof setTimeout> | undefined = undefined
 
 	constructor(internal: unknown) {
 		super(internal)
@@ -79,6 +80,8 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 			console.error('Telnet Error:', err)
 
 			this.updateStatus(InstanceStatus.ConnectionFailure, err.message)
+
+			this.disconnect()
 		})
 		this.telnet.on('connect', () => {
 			console.log('Connected!')
@@ -88,6 +91,8 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 			if (this.telnet) {
 				this.telnet.send('\x1B3CV\r')
 			}
+
+			this.setupHeartbeat()
 		})
 		this.telnet.on('data', (data) => {
 			console.log('Received:', data.toString())
@@ -99,6 +104,8 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	}
 
 	private disconnect(): void {
+		clearInterval(this.heartbeat)
+
 		if (this.telnet) {
 			this.telnet.removeAllListeners()
 			this.telnet.destroy()
@@ -106,6 +113,15 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		}
 
 		this.updateStatus(InstanceStatus.Disconnected)
+	}
+
+	private setupHeartbeat() {
+		// Heartbeat to keep connection alive
+		clearInterval(this.heartbeat)
+
+		this.heartbeat = setInterval(() => {
+			this.telnet?.send('N\n') // Should respond with model number
+		}, 10000)
 	}
 
 	private parseResponse(response: string): void {
