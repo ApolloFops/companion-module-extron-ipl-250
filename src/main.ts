@@ -76,13 +76,6 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 
 		this.updateStatus(InstanceStatus.Connecting)
 
-		this.telnet.on('error', (err) => {
-			console.error('Telnet Error:', err)
-
-			this.updateStatus(InstanceStatus.ConnectionFailure, err.message)
-
-			this.disconnect()
-		})
 		this.telnet.on('connect', () => {
 			console.log('Connected!')
 
@@ -94,13 +87,28 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 
 			this.setupHeartbeat()
 		})
+
 		this.telnet.on('data', (data) => {
 			console.log('Received:', data.toString())
 
 			this.parseResponse(data.toString())
 		})
-		this.telnet.on('iac', (command, option) => console.log('IAC:', command, option))
-		this.telnet.on('sb', (buffer) => console.log('Subnegotiation:', buffer))
+
+		this.telnet.on('error', (err) => {
+			console.error('Telnet Error:', err)
+
+			this.updateStatus(InstanceStatus.ConnectionFailure, err.message)
+
+			this.disconnect()
+		})
+
+		this.telnet.on('end', () => {
+			console.error('Connection closed')
+
+			this.updateStatus(InstanceStatus.Disconnected)
+
+			this.disconnect()
+		})
 	}
 
 	private disconnect(): void {
@@ -111,8 +119,6 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 			this.telnet.destroy()
 			this.telnet = null
 		}
-
-		this.updateStatus(InstanceStatus.Disconnected)
 	}
 
 	private setupHeartbeat() {
