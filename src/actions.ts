@@ -18,6 +18,12 @@ export type ActionsSchema = {
 			port: number
 		}
 	}
+	send_command: {
+		options: {
+			command: string
+			line_ending: number
+		}
+	}
 }
 
 export function UpdateActions(self: ModuleInstance): void {
@@ -104,6 +110,46 @@ export function UpdateActions(self: ModuleInstance): void {
 			callback: async (event) => {
 				if (self.telnet) {
 					self.telnet.send(`0${event.options.port}*2O\n`)
+				}
+			},
+		},
+		send_command: {
+			name: 'Send Command',
+			options: [
+				{
+					id: 'command',
+					type: 'textinput',
+					label: 'Command',
+				},
+				{
+					id: 'line_ending',
+					type: 'dropdown',
+					label: 'Line Ending',
+					default: 0,
+					choices: [
+						{ id: 0, label: 'Carriage Return (CR)' },
+						{ id: 1, label: 'Line Feed (LF)' },
+						{ id: 2, label: 'Carriage Return, Line Feed (CRLF)' },
+					],
+				},
+			],
+			callback: async (event) => {
+				let command: string = event.options.command
+
+				switch (event.options.line_ending) {
+					case 0:
+						command += '\r'
+						break
+					case 1:
+						command += '\n'
+						break
+					case 2:
+						command += '\r\n'
+						break
+				}
+
+				if (self.telnet) {
+					self.telnet.send(command)
 				}
 			},
 		},
