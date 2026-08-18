@@ -39,6 +39,7 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		this.updateStatus(InstanceStatus.Connecting)
 		this.initConnection()
 	}
+
 	// When module gets deleted
 	async destroy(): Promise<void> {
 		this.log('debug', 'destroy')
@@ -128,7 +129,7 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 		}
 	}
 
-	private setupHeartbeat() {
+	private setupHeartbeat(): void {
 		// Heartbeat to keep connection alive
 		clearInterval(this.heartbeat)
 
