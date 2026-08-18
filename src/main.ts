@@ -77,7 +77,11 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 			this.updateStatus(InstanceStatus.Ok)
 
 			if (this.telnet) {
+				// Set interface to verbose mode
 				this.telnet.send('\x1B3CV\r')
+
+				// Query all the contact inputs
+				this.telnet.send('1]2]3]4]\n')
 			}
 
 			this.setupHeartbeat()
