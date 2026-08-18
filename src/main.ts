@@ -5,6 +5,8 @@ import { UpgradeScripts } from './upgrades.js'
 import { UpdateActions, type ActionsSchema } from './actions.js'
 import { UpdatePresets } from './presets.js'
 
+const partNumber = '60-1026-81'
+
 export type ModuleSchema = {
 	config: ModuleConfig
 	secrets: undefined
@@ -80,6 +82,10 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 				// Set interface to verbose mode
 				this.telnet.send('\x1B3CV\r')
 
+				// Ask for the model number
+				// This allows us to validate that the user has connected to the right device
+				this.telnet.send('N\n')
+
 				// Query all the contact inputs
 				this.telnet.send('1]2]3]4]\n')
 			}
@@ -141,6 +147,23 @@ export default class ModuleInstance extends InstanceBase<ModuleSchema> {
 	}
 
 	private parseResponse(response: string): void {
+		// Part number
+		const partNumberRegex: RegExp = /Pno([^\r\n]+)\r\n/g
+		const partNumberMatches = partNumberRegex.exec(response)
+
+		if (partNumberMatches) {
+			if (partNumberMatches[1] != partNumber) {
+				this.log('warn', 'Part number does not match!')
+				this.updateStatus(
+					InstanceStatus.ConnectionFailure,
+					'Part number does not match! Are you connecting to the correct device?',
+				)
+
+				this.disconnect()
+				this.scheduleReconnect()
+			}
+		}
+
 		// Input values
 		const contactInputRegex: RegExp = /Cpn(\d) Sio(\d)\r\n/g
 		const contactInputMatches = [...response.matchAll(contactInputRegex)]
