@@ -13,6 +13,11 @@ export type ActionsSchema = {
 			value: boolean
 		}
 	}
+	toggle_relay: {
+		options: {
+			port: number
+		}
+	}
 }
 
 export function UpdateActions(self: ModuleInstance): void {
@@ -77,6 +82,28 @@ export function UpdateActions(self: ModuleInstance): void {
 			callback: async (event) => {
 				if (self.telnet) {
 					self.telnet.send(`0${event.options.port}*${event.options.value ? 1 : 0}O\n`)
+				}
+			},
+		},
+		toggle_relay: {
+			name: 'Toggle Relay',
+			options: [
+				{
+					id: 'port',
+					type: 'dropdown',
+					label: 'Port',
+					default: 1,
+					choices: [
+						{ id: 1, label: 'Relay 1' },
+						{ id: 2, label: 'Relay 2' },
+						{ id: 3, label: 'Relay 3' },
+						{ id: 4, label: 'Relay 4' },
+					],
+				},
+			],
+			callback: async (event) => {
+				if (self.telnet) {
+					self.telnet.send(`0${event.options.port}*2O\n`)
 				}
 			},
 		},
