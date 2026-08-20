@@ -1100,9 +1100,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"extron-ipl-250@workspace:.":
+"extron-ipl250@workspace:.":
   version: 0.0.0-use.local
-  resolution: "extron-ipl-250@workspace:."
+  resolution: "extron-ipl250@workspace:."
   dependencies:
     "@companion-module/base": "npm:2.0.4"
     "@companion-module/tools": "npm:^3.0.1"

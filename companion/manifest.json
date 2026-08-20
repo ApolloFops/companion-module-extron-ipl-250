@@ -1,14 +1,14 @@
 {
 	"$schema": "../node_modules/@companion-module/base/assets/manifest.schema.json",
 	"type": "connection",
-	"id": "extron-ipl-250",
-	"name": "extron-ipl-250",
+	"id": "extron-ipl250",
+	"name": "extron-ipl250",
 	"shortname": "IPL 250",
 	"description": "Extron IPL 250 control processor module for Companion.",
 	"version": "0.0.0",
 	"license": "MIT",
-	"repository": "git+https://github.com/ApolloFops/companion-module-extron-ipl-250.git",
-	"bugs": "https://github.com/ApolloFops/companion-module-extron-ipl-250/issues",
+	"repository": "git+https://github.com/ApolloFops/companion-module-extron-ipl250.git",
+	"bugs": "https://github.com/ApolloFops/companion-module-extron-ipl250/issues",
 	"maintainers": [
 		{
 			"name": "Apollo Nargang",

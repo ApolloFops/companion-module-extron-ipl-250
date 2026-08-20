@@ -1,4 +1,4 @@
-# companion-module-extron-ipl-250
+# companion-module-extron-ipl250
 
 See [HELP.md](./companion/HELP.md) and [LICENSE](./LICENSE)
 
